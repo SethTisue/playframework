@@ -193,6 +193,7 @@ object Dependencies {
   def sbtRcClient(scalaBinaryVersion: String): ModuleID = CrossVersion.partialVersion(scalaBinaryVersion) match {
     case Some((2, 10)) => "com.typesafe.sbtrc" % "client-2-10" % sbtRcVersion
     case Some((2, 11)) => "com.typesafe.sbtrc" % "client-2-11" % sbtRcVersion
+    case Some((2, 12)) => "com.typesafe.sbtrc" % "client-2-11" % sbtRcVersion
     case _ => sys.error(s"Unsupported scala version: $scalaBinaryVersion")
   }
 
@@ -205,6 +206,7 @@ object Dependencies {
   def sbtRcActorClient(scalaBinaryVersion: String): ModuleID = CrossVersion.partialVersion(scalaBinaryVersion) match {
     case Some((2, 10)) => "com.typesafe.sbtrc" % "actor-client-2-10" % sbtRcVersion
     case Some((2, 11)) => "com.typesafe.sbtrc" % "actor-client-2-11" % sbtRcVersion
+    case Some((2, 12)) => "com.typesafe.sbtrc" % "actor-client-2-11" % sbtRcVersion
     case _ => sys.error(s"Unsupported scala version: $scalaBinaryVersion")
   }
 
