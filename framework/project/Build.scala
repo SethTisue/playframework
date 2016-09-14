@@ -103,6 +103,12 @@ object BuildSettings {
         autoScalaLibrary := false,
         crossPaths := false
       )
+      .settings(
+        resolvers += "pr" at "https://scala-ci.typesafe.com/artifactory/scala-pr-validation-snapshots/",
+        scalaVersion := "2.12.0-a919fd7-SNAPSHOT",
+        scalaBinaryVersion := "2.12.0-RC1"
+      )
+
   }
 
   /**
@@ -128,6 +134,11 @@ object BuildSettings {
       .enablePlugins(PlayLibrary)
       .settings(playRuntimeSettings: _*)
       .settings(omnidocSettings: _*)
+        .settings(
+          resolvers += "pr" at "https://scala-ci.typesafe.com/artifactory/scala-pr-validation-snapshots/",
+          scalaVersion := "2.12.0-a919fd7-SNAPSHOT",
+          scalaBinaryVersion := "2.12.0-RC1"
+        )
   }
 
   def omnidocSettings: Seq[Setting[_]] = Omnidoc.projectSettings ++ Seq(
@@ -494,7 +505,10 @@ object PlayBuild extends Build {
     .enablePlugins(CrossPerProjectPlugin)
     .settings(playCommonSettings: _*)
     .settings(
-      scalaVersion := (scalaVersion in PlayProject).value,
+      // scalaVersion := (scalaVersion in PlayProject).value,
+      resolvers += "pr" at "https://scala-ci.typesafe.com/artifactory/scala-pr-validation-snapshots/",
+      scalaVersion := "2.12.0-a919fd7-SNAPSHOT",
+      scalaBinaryVersion := "2.12.0-RC1",
       playBuildRepoName in ThisBuild := "playframework",
       concurrentRestrictions in Global += Tags.limit(Tags.Test, 1),
       libraryDependencies ++= (runtime(scalaVersion.value) ++ jdbcDeps),
