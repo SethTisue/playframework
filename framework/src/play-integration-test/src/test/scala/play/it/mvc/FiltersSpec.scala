@@ -19,7 +19,7 @@ import play.it._
 import scala.concurrent.duration.Duration
 import scala.concurrent._
 
-import scala.concurrent.ExecutionContext.Implicits.{ global => ec }
+import scala.concurrent.ExecutionContext.{ global => ec }
 
 class NettyDefaultFiltersSpec extends DefaultFiltersSpec with NettyIntegrationSpecification
 class AkkaDefaultHttpFiltersSpec extends DefaultFiltersSpec with AkkaHttpIntegrationSpecification
@@ -246,7 +246,7 @@ trait FiltersSpec extends Specification with ServerIntegrationSpecification {
         try {
           next.apply(request).recover(new java.util.function.Function[Throwable, Result]() {
             def apply(t: Throwable) = getResult(t)
-          }, ec)
+          }, ec: ExecutionContextExecutor)
         } catch {
           case t: Throwable => Accumulator.done(getResult(t))
         }
