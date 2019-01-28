@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package play.mvc;
@@ -50,7 +50,7 @@ public class ResponseHeader {
         return Collections.unmodifiableMap(headers);
     }
 
-    public ResponseHeader discardHeader(String name) {
+    public ResponseHeader withoutHeader(String name) {
         Map<String, String> updatedHeaders = copyCurrentHeaders();
         updatedHeaders.remove(name);
         return new ResponseHeader(status, updatedHeaders, reasonPhrase);

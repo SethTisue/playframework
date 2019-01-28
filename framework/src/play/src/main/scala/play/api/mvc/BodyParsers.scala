@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package play.api.mvc
@@ -192,7 +192,7 @@ object MultipartFormData {
   /**
    * A file part.
    */
-  case class FilePart[A](key: String, filename: String, contentType: Option[String], ref: A) extends Part[A]
+  case class FilePart[A](key: String, filename: String, contentType: Option[String], ref: A, dispositionType: String = "form-data") extends Part[A]
 
   /**
    * A part that has not been properly parsed.

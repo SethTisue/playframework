@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package javaguide.http;
@@ -99,8 +99,8 @@ public class JavaActionsComposition extends Controller {
 
     // #pass-arg-action-index
     @With(PassArgAction.class)
-    public static Result passArgIndex() {
-        User user = request().attrs().get(Attrs.USER);
+    public static Result passArgIndex(Http.Request request) {
+        User user = request.attrs().get(Attrs.USER);
         return ok(Json.toJson(user));
     }
     // #pass-arg-action-index

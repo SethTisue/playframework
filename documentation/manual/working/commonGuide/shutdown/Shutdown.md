@@ -1,4 +1,4 @@
-<!--- Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com> -->
+<!--- Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com> -->
 # Coordinated Shutdown
 
 Play 2.6 incorporated the use of Akka's [Coordinated Shutdown](https://doc.akka.io/docs/akka/current/actors.html?language=scala#coordinated-shutdown) but still didn't rely on it completely. Since Play 2.7, Coordinated Shutdown is responsible for the complete shutdown of Play. In production, the trigger to invoke the clean shutdown could be a `SIGTERM` or, if your Play process is part of an Akka Cluster, a [`Downing`](https://doc.akka.io/docs/akka/2.5/cluster-usage.html) event.
@@ -42,3 +42,14 @@ Scala
 Java
 : @[shutdown-task](code/shutdown/ResourceAllocatingJavaClass.java)
 
+## Shutdown triggers
+
+A Play process is usually terminated via a `SIGTERM` signal. When the Play process receives the signal, a JVM shutdown hook is run causing the server to stop via invoking Coordinated Shutdown.
+
+Other possible triggers differ from `SIGTERM` slightly. While `SIGTERM` is handled in an outside-in fashion, you may trigger a shutdown from your code (or a library may detect a cause to trigger the shutdown). For example when running your Play process as part of an Akka Cluster or adding an endpoint on your API that would allow an admin or an orchestrator to trigger a programmatic shutdown. In these scenarios the shutdown is inside out: all the phases of the Coordinated Shutdown list are run in the appropriate order, but the Actor System will terminate before the JVM shutdown hook runs.
+
+When developing your Play application, you should consider all the termination triggers and what steps and in which order they will run.
+
+## Limitations
+
+Akka Coordinated Shutdown ships with some settings making it very configurable. Despite that, using Akka Coordinated Shutdown within Play lifecycle makes some of these settings invalid. One such setting is `akka.coordinated-shutdown.exit-jvm`. Enabling `akka.coordinated-shutdown.exit-jvm` in a Play project will cause a deadlock at shutdown preventing your process to ever complete. In general, the default values tuning Akka Coordinated Shutdown should be fine in all Production, Development and Test modes.

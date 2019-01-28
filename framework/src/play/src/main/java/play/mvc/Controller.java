@@ -1,19 +1,13 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package play.mvc;
 
 import play.i18n.Lang;
-
 import play.i18n.MessagesApi;
-import play.mvc.Http.HeaderNames;
-import play.mvc.Http.Response;
-import play.mvc.Http.Context;
-import play.mvc.Http.Request;
-import play.mvc.Http.Session;
-import play.mvc.Http.Status;
-import play.mvc.Http.Flash;
+
+import static play.mvc.Http.*;
 
 /**
  * Superclass for a Java-based controller.
@@ -22,9 +16,18 @@ public abstract class Controller extends Results implements Status, HeaderNames 
 
     /**
      * Generates a 501 NOT_IMPLEMENTED simple result.
+     *
+     * @deprecated Deprecated as of 2.7.0. Use {@link #TODO(Request)} instead.
      */
+    @Deprecated
     public static Result TODO() {
-        play.mvc.Http.Request request = Http.Context.current().request();
+        return TODO(Http.Context.current().request());
+    }
+
+    /**
+     * Generates a 501 NOT_IMPLEMENTED simple result.
+     */
+    public static Result TODO(Request request) {
         return status(NOT_IMPLEMENTED, views.html.defaultpages.todo.render(request.asScala()));
     }
 
@@ -32,7 +35,10 @@ public abstract class Controller extends Results implements Status, HeaderNames 
      * Returns the current HTTP context.
      *
      * @return the context
+     *
+     * @deprecated Deprecated as of 2.7.0. <a href="https://www.playframework.com/documentation/latest/JavaHttpContextMigration27">See migration guide.</a>.
      */
+    @Deprecated
     public static Context ctx() {
         return Http.Context.current();
     }
@@ -41,7 +47,10 @@ public abstract class Controller extends Results implements Status, HeaderNames 
      * Returns the current HTTP request.
      *
      * @return the request
+     *
+     * @deprecated Deprecated as of 2.7.0. <a href="https://www.playframework.com/documentation/latest/JavaHttpContextMigration27">See migration guide.</a>.
      */
+    @Deprecated
     public static Request request() {
         return Http.Context.current().request();
     }
@@ -50,7 +59,10 @@ public abstract class Controller extends Results implements Status, HeaderNames 
      * Returns the current lang.
      *
      * @return the language
+     *
+     * @deprecated Deprecated as of 2.7.0. <a href="https://www.playframework.com/documentation/latest/JavaHttpContextMigration27">See migration guide.</a>.
      */
+    @Deprecated
     public static Lang lang() {
         return Http.Context.current().lang();
     }
@@ -84,7 +96,7 @@ public abstract class Controller extends Results implements Status, HeaderNames 
     /**
      * Clear the lang for the current user.
      *
-     * @deprecated Deprecated as of 2.7.0. Use {@link MessagesApi#clearLang(Result)} or {@link Result#clearingLang(MessagesApi)}.
+     * @deprecated Deprecated as of 2.7.0. Use {@link MessagesApi#clearLang(Result)} or {@link Result#withoutLang(MessagesApi)}.
      */
     @Deprecated
     public static void clearLang() {

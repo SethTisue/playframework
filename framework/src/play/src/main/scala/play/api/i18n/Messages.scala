@@ -1,15 +1,12 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package play.api.i18n
 
 import java.net.URL
-import java.util.Collections
-import java.util.function.Function
-import java.util.stream.Collectors
-import javax.inject.{ Inject, Provider, Singleton }
 
+import javax.inject.{ Inject, Provider, Singleton }
 import play.api._
 import play.api.http.HttpConfiguration
 import play.api.libs.typedmap.TypedKey
@@ -20,7 +17,6 @@ import play.mvc.Http
 import play.utils.{ PlayIO, Resources }
 
 import scala.annotation.implicitNotFound
-import scala.collection.mutable
 import scala.collection.breakOut
 import scala.io.Codec
 import scala.language._
@@ -339,7 +335,7 @@ trait Messages extends MessagesProvider {
 /**
  * This trait is used to indicate when a Messages instance can be produced.
  */
-@implicitNotFound("An implicit MessagesProvider instance was not found.  Please see https://www.playframework.com/documentation/2.6.x/ScalaForms#Passing-MessagesProvider-to-Form-Helpers")
+@implicitNotFound("An implicit MessagesProvider instance was not found.  Please see https://www.playframework.com/documentation/latest/ScalaForms#Passing-MessagesProvider-to-Form-Helpers")
 trait MessagesProvider {
   def messages: Messages
 }
@@ -420,10 +416,13 @@ trait MessagesApi {
   def isDefinedAt(key: String)(implicit lang: Lang): Boolean
 
   /**
-   * Set the language on the result
+   * Given a [[Result]] and a [[Lang]], return a new [[Result]] with the lang cookie set to the given [[Lang]].
    */
   def setLang(result: Result, lang: Lang): Result
 
+  /**
+   * Given a [[Result]], return a new [[Result]] with the lang cookie discarded.
+   */
   def clearLang(result: Result): Result
 
   def langCookieName: String
@@ -482,9 +481,9 @@ class DefaultMessagesApi @Inject() (
   }
 
   override def preferred(request: RequestHeader): Messages = {
-    val maybeLangFromContext = request.attrs.get(Messages.Attrs.CurrentLang)
+    val maybeLangFromRequest = request.transientLang()
     val maybeLangFromCookie = request.cookies.get(langCookieName).flatMap(c => Lang.get(c.value))
-    val lang = langs.preferred(maybeLangFromContext.toSeq ++ maybeLangFromCookie.toSeq ++ request.acceptLanguages)
+    val lang = langs.preferred(maybeLangFromRequest.toSeq ++ maybeLangFromCookie.toSeq ++ request.acceptLanguages)
     MessagesImpl(lang, this)
   }
 

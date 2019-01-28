@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package play.api.mvc
@@ -45,7 +45,7 @@ case class Cookie(
     sameSite: Option[Cookie.SameSite] = None
 ) {
   lazy val asJava = {
-    new JCookie(name, value, maxAge.map(i => new Integer(i)).orNull, path, domain.orNull,
+    new JCookie(name, value, maxAge.map(i => Integer.valueOf(i)).orNull, path, domain.orNull,
       secure, httpOnly, sameSite.map(_.asJava).orNull)
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package play.core.j
@@ -22,6 +22,7 @@ import play.i18n.{ Langs => JLangs, MessagesApi => JMessagesApi }
 import play.libs.AnnotationUtils
 import play.mvc.Http.{ Context => JContext, Request => JRequest }
 
+import scala.compat.java8.OptionConverters._
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ExecutionContext, Future }
 
@@ -83,12 +84,12 @@ abstract class JavaAction(val handlerComponents: JavaHandlerComponents)
     val rootAction = new JAction[Any] {
       override def call(ctx: JContext): CompletionStage[JResult] = {
         // The context may have changed, set it again
-        val oldContext = JContext.current.get()
+        val oldContext = JContext.safeCurrent().asScala
         try {
-          JContext.current.set(ctx)
+          JContext.setCurrent(ctx)
           invocation(ctx.request())
         } finally {
-          JContext.current.set(oldContext)
+          oldContext.foreach(JContext.setCurrent)
         }
       }
     }

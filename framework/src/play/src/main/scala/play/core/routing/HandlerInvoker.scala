@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package play.core.routing
@@ -167,10 +167,10 @@ object HandlerInvokerFactory {
 
             val callWithContext = {
               try {
-                Context.current.set(javaContext)
+                Context.setCurrent(javaContext)
                 FutureConverters.toScala(call(request.asJava))
               } finally {
-                Context.current.remove()
+                Context.clear()
               }
             }
 

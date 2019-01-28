@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package play.api.mvc
@@ -390,7 +390,7 @@ trait LegacyI18nSupport {
      *
      * For example:
      * {{{
-     * Ok(Messages("hello.world")).clearingLang
+     * Ok(Messages("hello.world")).withoutLang
      * }}}
      *
      * @return the new result
@@ -509,6 +509,23 @@ trait Results {
       Result(
         header = header,
         body = HttpEntity.Chunked(content.map(c => HttpChunk.Chunk(writeable.transform(c))), writeable.contentType)
+      )
+    }
+
+    /**
+     * Feed the content as the response, using a streamed entity.
+     *
+     * It will use the given Content-Type, but if is not present, then it fallsback
+     * to use the [[Writeable]] contentType.
+     *
+     * @param content Source providing the content to stream.
+     * @param contentLength an optional content length.
+     * @param contentType an optional content type.
+     */
+    def streamed[C](content: Source[C, _], contentLength: Option[Long], contentType: Option[String] = None)(implicit writeable: Writeable[C]): Result = {
+      Result(
+        header = header,
+        body = HttpEntity.Streamed(content.map(c => writeable.transform(c)), contentLength, contentType.orElse(writeable.contentType))
       )
     }
 
@@ -648,8 +665,14 @@ trait Results {
   /** Generates a ‘424 FAILED_DEPENDENCY’ result. */
   val FailedDependency = new Status(FAILED_DEPENDENCY)
 
+  /** Generates a ‘428 PRECONDITION_REQUIRED’ result. */
+  val PreconditionRequired = new Status(PRECONDITION_REQUIRED)
+
   /** Generates a ‘429 TOO_MANY_REQUESTS’ result. */
   val TooManyRequests = new Status(TOO_MANY_REQUESTS)
+
+  /** Generates a ‘431 REQUEST_HEADER_FIELDS_TOO_LARGE’ result. */
+  val RequestHeaderFieldsTooLarge = new Status(REQUEST_HEADER_FIELDS_TOO_LARGE)
 
   /** Generates a ‘429 TOO_MANY_REQUEST’ result. */
   @deprecated("Use TooManyRequests instead", "2.6.0")
@@ -676,6 +699,9 @@ trait Results {
   /** Generates a ‘507 INSUFFICIENT_STORAGE’ result. */
   val InsufficientStorage = new Status(INSUFFICIENT_STORAGE)
 
+  /** Generates a ‘511 NETWORK_AUTHENTICATION_REQUIRED’ result. */
+  val NetworkAuthenticationRequired = new Status(NETWORK_AUTHENTICATION_REQUIRED)
+
   /**
    * Generates a simple result.
    *
@@ -698,7 +724,7 @@ trait Results {
    * @param queryString queryString parameters to add to the queryString
    * @param status HTTP status for redirect, such as SEE_OTHER, MOVED_TEMPORARILY or MOVED_PERMANENTLY
    */
-  def Redirect(url: String, queryString: Map[String, Seq[String]] = Map.empty, status: Int = SEE_OTHER) = {
+  def Redirect(url: String, queryString: Map[String, Seq[String]] = Map.empty, status: Int = SEE_OTHER): Result = {
     import java.net.URLEncoder
     val fullUrl = url + Option(queryString).filterNot(_.isEmpty).map { params =>
       (if (url.contains("?")) "&" else "?") + params.toSeq.flatMap { pair =>

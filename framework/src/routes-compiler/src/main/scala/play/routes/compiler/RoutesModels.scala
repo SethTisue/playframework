@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2018 Lightbend Inc. <https://www.lightbend.com>
+ * Copyright (C) 2009-2019 Lightbend Inc. <https://www.lightbend.com>
  */
 
 package play.routes.compiler
@@ -48,10 +48,11 @@ case class HttpVerb(value: String) {
  * @param method The method to invoke on the controller.
  * @param parameters The parameters to pass to the method.
  */
-case class HandlerCall(packageName: String, controller: String, instantiate: Boolean, method: String, parameters: Option[Seq[Parameter]]) extends Positional {
+case class HandlerCall(packageName: Option[String], controller: String, instantiate: Boolean, method: String, parameters: Option[Seq[Parameter]]) extends Positional {
   private val dynamic = if (instantiate) "@" else ""
+  lazy val routeParams: Seq[Parameter] = parameters.toIndexedSeq.flatten.filterNot(_.isJavaRequest)
   lazy val passJavaRequest: Boolean = parameters.getOrElse(Nil).exists(_.isJavaRequest)
-  override def toString = dynamic + packageName + "." + controller + dynamic + "." + method + parameters.map { params =>
+  override def toString = dynamic + packageName.map(_ + ".").getOrElse("") + controller + dynamic + "." + method + parameters.map { params =>
     "(" + params.mkString(", ") + ")"
   }.getOrElse("")
 }
@@ -72,7 +73,7 @@ object Parameter {
 case class Parameter(name: String, typeName: String, fixed: Option[String], default: Option[String]) extends Positional {
   import Parameter._
 
-  def isJavaRequest = typeName.equalsIgnoreCase(requestClass) || typeName.equalsIgnoreCase(requestClassFQ)
+  def isJavaRequest = typeName == requestClass || typeName == requestClassFQ
   def typeNameReal = if (isJavaRequest) { requestClassFQ } else { typeName }
   def nameClean = if (isJavaRequest) { "req" } else { name }
   override def toString = name + ":" + typeName + fixed.map(" = " + _).getOrElse("") + default.map(" ?= " + _).getOrElse("")
